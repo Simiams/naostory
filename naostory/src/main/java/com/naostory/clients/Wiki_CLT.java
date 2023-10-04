@@ -66,6 +66,8 @@ public class Wiki_CLT {
                         monument.setLatitude(col.get(2).select("a").attr("data-lat"));
                         monument.setDate(col.get(5).text());
                         monument.setImage(transformImageUrl("https:" + col.get(6).select("img").attr("src"), 390));
+                        monument.setTopLeftCornerLat((Float.parseFloat(monument.getLatitude()) + 0.002f) + "");
+                        monument.setTopLeftCornerLong((Float.parseFloat(monument.getLongitude()) - 0.002f) + "");
                         monuments.add(monument);
                     }
                 });
@@ -80,6 +82,7 @@ public class Wiki_CLT {
         getMonuments().forEach(monument -> {
             monuments.add(getWikiContent(monument));
         });
+        iMonumentRep.saveAll(monuments);
         return monuments;
     }
 

@@ -23,4 +23,6 @@ public class Monument_MDL {
     private String url;
     private String longitude;
     private String latitude;
+    private String topLeftCornerLong;
+    private String topLeftCornerLat;
 }
