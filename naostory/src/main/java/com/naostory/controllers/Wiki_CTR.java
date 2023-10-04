@@ -29,10 +29,4 @@ public class Wiki_CTR {
     public List<Monument_MDL> getAllMonuments() {
         return wikiClt.getAllMonuments();
     }
-
-//    @GetMapping("/content")
-//    public String getWikiContent() {
-////        return wikiClt.getWikiContent();
-//    }
-
 }

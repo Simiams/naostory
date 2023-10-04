@@ -1,15 +1,10 @@
 package com.naostory.models;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.List;
 
 @Document(collection = "monuments")
 @Getter
@@ -25,4 +20,7 @@ public class Monument_MDL {
     private String date;
     private String image;
     private String content;
+    private String url;
+    private String longitude;
+    private String latitude;
 }

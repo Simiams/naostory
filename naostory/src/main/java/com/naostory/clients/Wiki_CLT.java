@@ -10,6 +10,8 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -26,14 +28,18 @@ public class Wiki_CLT {
 
 
     public Monument_MDL getWikiContent(Monument_MDL monument) {
-            String wikipediaPageURL = "https://fr.wikipedia.org/wiki/Albert_Einstein";
+            String wikipediaPageURL = "https://fr.wikipedia.org/" + monument.getUrl();
             String className = "mw-parser-output";
+            String id = "mw-content-text";
 
             try {
                 Document doc = Jsoup.connect(wikipediaPageURL).get();
-                Objects.requireNonNull(doc.getElementsByClass(className)).get(0).children().forEach(element -> {
-                    if (element.tagName().equals("p")) {
-                        monument.setContent(monument.getContent() + element.text());
+                Objects.requireNonNull(Objects.requireNonNull(doc.getElementById(id)).getElementsByClass(className)).get(0).children().forEach(element -> {
+                    if (element.tagName().equals("p") && !element.text().isEmpty()) {
+                        if (monument.getContent() == null)
+                            monument.setContent(element.toString());
+                        else
+                            monument.setContent(Objects.requireNonNull(monument.getContent()) + element.toString());
                     }
                 });
             } catch (IOException e) {
@@ -53,10 +59,13 @@ public class Wiki_CLT {
                     if (!col.isEmpty()) {
                         Monument_MDL monument = new Monument_MDL();
                         monument.setName(col.get(0).text());
+                        monument.setUrl(col.get(0).select("a").attr("href"));
                         monument.setAddress(col.get(1).text());
                         monument.setCoordinates(col.get(2).text());
-                        monument.setDate(col.get(3).text());
-                        monument.setImage(col.get(4).text());
+                        monument.setLongitude(col.get(2).select("a").attr("data-lon"));
+                        monument.setLatitude(col.get(2).select("a").attr("data-lat"));
+                        monument.setDate(col.get(5).text());
+                        monument.setImage(transformImageUrl("https:" + col.get(6).select("img").attr("src"), 390));
                         monuments.add(monument);
                     }
                 });
@@ -72,5 +81,19 @@ public class Wiki_CLT {
             monuments.add(getWikiContent(monument));
         });
         return monuments;
+    }
+
+    public static String transformImageUrl(String imageUrl, int newWidth) {
+        try {
+            URL url = new URL(imageUrl);
+            String path = url.getPath();
+            String[] pathSegments = path.split("/");
+            String fileName = pathSegments[pathSegments.length - 1];
+            String newImageUrl = url.getProtocol() + "://" + url.getHost() + path.replace(fileName, newWidth + "px-" + fileName);
+            return newImageUrl;
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return imageUrl;
+        }
     }
 }
